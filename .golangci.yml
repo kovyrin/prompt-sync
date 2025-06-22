@@ -1,0 +1,34 @@
+# GolangCI-Lint configuration for Prompt-Sync
+# Docs: https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  tests: true
+
+# Disable all linters first, then enable a curated set of recommended ones
+linters:
+  disable-all: true
+  enable:
+    - govet          # basic static analysis (always useful)
+    - staticcheck    # advanced static analysis
+    - errcheck       # check that errors are handled
+    - gofmt          # code is formatted with gofmt
+    - goimports      # import order & formatting
+    - ineffassign    # detect ineffectual assignments
+    - misspell       # detect misspelled words
+    - revive         # style checker (successor of golint)
+
+revive:
+  confidence: 0.8
+
+issues:
+  # Exclude generated files
+  exclude-generated: true
+
+  # Exclude specific directories (none yet, placeholder)
+  exclude-dirs:
+    - vendor
+    - third_party
+
+  # Put any false-positives here
+  exclude-rules: []

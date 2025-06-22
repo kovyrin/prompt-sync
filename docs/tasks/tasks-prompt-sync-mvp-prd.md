@@ -59,15 +59,15 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
 ## Tasks
 
-- [ ] 0. Development environment & CI scaffolding
+- [x] 0. Development environment & CI scaffolding
 
-  - [ ] 0.1. Create `Makefile` with `test`, `lint`, and `watch` targets (`watch` re-runs `make test` on file changes using `entr`).
+  - [x] 0.1. Create `Makefile` with `test`, `lint`, and `watch` targets (`watch` re-runs `make test` on file changes using `entr`).
 
-  - [ ] 0.2. Add `.golangci.yml` configuration enabling recommended linters; ensure `make lint` runs `golangci-lint run`.
+  - [x] 0.2. Add `.golangci.yml` configuration enabling recommended linters; ensure `make lint` runs `golangci-lint run`.
 
-  - [ ] 0.3. Add GitHub Actions workflow `.github/workflows/ci.yml` that runs `make test` and `make lint` on every push/PR.
+  - [x] 0.3. Add GitHub Actions workflow `.github/workflows/ci.yml` that runs `make test` and `make lint` on every push/PR.
 
-  - [ ] 0.4. Run `make test` and `make lint` locally to confirm green baseline.
+  - [x] 0.4. Run `make test` and `make lint` locally to confirm green baseline.
 
 - [ ] 1. Bootstrap CLI skeleton & `init` command
 
