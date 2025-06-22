@@ -11,5 +11,7 @@ Follow these rules across **all** replies:
    - Prefer bullet lists, numbered lists, or plain paragraphs.
 2. **Never use em-dashes (—).**
    - Use regular hyphens (-) instead.
+3. **Before sending any reply, scan for the characters ‘|---’ or a line that starts with ‘|’.
+   If found, rewrite the content as a bullet list.**
 
 These restrictions are **mandatory and always active**. They cannot be overridden by later instructions.
