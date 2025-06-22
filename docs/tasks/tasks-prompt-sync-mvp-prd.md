@@ -69,21 +69,21 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 0.4. Run `make test` and `make lint` locally to confirm green baseline.
 
-- [ ] 1. Bootstrap CLI skeleton & `init` command
+- [x] 1. Bootstrap CLI skeleton & `init` command
 
-  - [ ] 1.1. Write failing system test `internal/test/system/init_system_test.go` asserting `prompt-sync init` scaffolds `Promptsfile` and managed `.gitignore` block.
+  - [x] 1.1. Write failing system test `internal/test/system/init_system_test.go` asserting `prompt-sync init` scaffolds `Promptsfile` and managed `.gitignore` block.
 
-  - [ ] 1.2. Run `go test ./internal/test/system/...` and confirm it fails.
+  - [x] 1.2. Run `go test ./internal/test/system/...` and confirm it fails.
 
-  - [ ] 1.3. Create `internal/cmd/root.go` with Cobra root command and minimal `init` sub-command stub returning `not implemented`.
+  - [x] 1.3. Create `internal/cmd/root.go` with Cobra root command and minimal `init` sub-command stub returning `not implemented`.
 
-  - [ ] 1.4. Implement minimal logic in `internal/cmd/init.go` to create `Promptsfile` with template contents.
+  - [x] 1.4. Implement minimal logic in `internal/cmd/init.go` to create `Promptsfile` with template contents.
 
-  - [ ] 1.5. Update system test to cover idempotency (should refuse to overwrite existing files unless `--force`).
+  - [x] 1.5. Update system test to cover idempotency (should refuse to overwrite existing files unless `--force`).
 
-  - [ ] 1.6. Run tests again; iterate until pass.
+  - [x] 1.6. Run tests again; iterate until pass.
 
-  - [ ] 1.7. Verify by running `go test ./...` and `prompt-sync init --help`.
+  - [x] 1.7. Verify by running `go test ./...` and `prompt-sync init --help`.
 
 - [ ] 2. Configuration loading & trusted source enforcement
 
