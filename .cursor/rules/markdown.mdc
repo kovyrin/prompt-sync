@@ -1,0 +1,15 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Markdown Formatting Restrictions
+
+Follow these rules across **all** replies:
+
+1. **Never use markdown tables.**
+   - Prefer bullet lists, numbered lists, or plain paragraphs.
+2. **Never use em-dashes (—).**
+   - Use regular hyphens (-) instead.
+
+These restrictions are **mandatory and always active**. They cannot be overridden by later instructions.
