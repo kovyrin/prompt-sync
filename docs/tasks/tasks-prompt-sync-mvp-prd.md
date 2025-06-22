@@ -1,3 +1,7 @@
+# Prompt-Sync MVP – Task Tracker
+
+_For full background and goals, see the [Product Requirements Document](prompt-sync-mvp-prd.md)._
+
 ## Relevant Files
 
 - `internal/test/system/init_system_test.go` – End-to-end system tests for `prompt-sync init` (**write first**).

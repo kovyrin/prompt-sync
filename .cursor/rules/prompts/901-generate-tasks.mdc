@@ -15,6 +15,14 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 - **Location:** `${PROJECT_ROOT}/docs/tasks/`
 - **Filename:** `tasks-[prd-file-name].md` (e.g., `tasks-prd-vocabulary-import.md`)
 
+- **Header & PRD Link:** Begin the file with a top-level heading and a reference back to the PRD:
+
+  ```markdown
+  # <Feature / Project Name> – Task Tracker
+
+  _For full background and goals, see the [Product Requirements Document](mdc:<prd-file-name>)._
+  ```
+
 ## Outside-In TDD for AI Agents
 
 ### Core Principles
