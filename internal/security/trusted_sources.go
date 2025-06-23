@@ -78,7 +78,6 @@ func NewTrustedSources() *TrustedSources {
 			"github.com:personal/*",
 			"github.com:pack1/*",
 			"github.com:pack2/*",
-			"github.com:untrusted/*", // For testing, remove in production
 		},
 	}
 }
