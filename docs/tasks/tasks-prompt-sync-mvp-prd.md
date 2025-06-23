@@ -182,25 +182,25 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 6.4. Verify by running `go test ./...` and testing command outputs.
 
-- [ ] 7. Package lifecycle: `add` command (adding new prompts)
+- [x] 7. Package lifecycle: `add` command (adding new prompts)
 
-  - [ ] 7.1. Write unit tests in `internal/test/unit/add_command_test.go` covering:
+  - [x] 7.1. Write unit tests in `internal/test/unit/add_command_test.go` covering:
 
     - Adding valid prompt sources
     - Rejecting untrusted sources (without --allow-unknown)
     - Handling duplicate prompt names
     - Version/branch specification
 
-  - [ ] 7.2. Implement `internal/cmd/add.go`:
+  - [x] 7.2. Implement `internal/cmd/add.go`:
 
     - Parse and validate source URL
     - Update Promptsfile with new entry
     - Trigger install workflow
     - Handle `--no-install` flag
 
-  - [ ] 7.3. Add integration tests for various add scenarios.
+  - [x] 7.3. Add integration tests for various add scenarios.
 
-  - [ ] 7.4. Verify by adding prompts to a test project.
+  - [x] 7.4. Verify by adding prompts to a test project.
 
 - [ ] 8. Package lifecycle: `remove` command (removing prompts)
 
