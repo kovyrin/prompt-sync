@@ -163,24 +163,24 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 5.9c. Execute `prompt-sync verify` on sample repo and confirm no drift detected.
 
-- [ ] 6. Package lifecycle: `list` command (read-only operations)
+- [x] 6. Package lifecycle: `list` command (read-only operations)
 
-  - [ ] 6.1. Write unit tests in `internal/test/unit/list_command_test.go` covering:
+  - [x] 6.1. Write unit tests in `internal/test/unit/list_command_test.go` covering:
 
     - Basic listing of installed prompts
     - `--files` flag to show rendered file paths
     - `--outdated` flag to show available updates
     - JSON output format with `--json`
 
-  - [ ] 6.2. Implement `internal/cmd/list.go`:
+  - [x] 6.2. Implement `internal/cmd/list.go`:
 
     - Read from Promptsfile and lock file
     - Display prompt sources, versions, and status
     - Support multiple output formats (table, json)
 
-  - [ ] 6.3. Add integration tests for `list` with various prompt configurations.
+  - [x] 6.3. Add integration tests for `list` with various prompt configurations.
 
-  - [ ] 6.4. Verify by running `go test ./...` and testing command outputs.
+  - [x] 6.4. Verify by running `go test ./...` and testing command outputs.
 
 - [ ] 7. Package lifecycle: `add` command (adding new prompts)
 
