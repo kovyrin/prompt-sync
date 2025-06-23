@@ -222,25 +222,25 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 8.4. Verify removal doesn't break other prompts.
 
-- [ ] 9. Package lifecycle: `update` command (updating existing prompts)
+- [x] 9. Package lifecycle: `update` command (updating existing prompts)
 
-  - [ ] 9.1. Write unit tests in `internal/test/unit/update_command_test.go` covering:
+  - [x] 9.1. Write unit tests in `internal/test/unit/update_command_test.go` covering:
 
     - Updating all prompts vs. specific ones
     - Respecting version constraints
     - Handling breaking changes warnings
     - Lock file updates
 
-  - [ ] 9.2. Implement `internal/cmd/update.go`:
+  - [x] 9.2. Implement `internal/cmd/update.go`:
 
     - Check for available updates
     - Handle version resolution
     - Update Promptsfile for unpinned sources
     - Regenerate lock file with new hashes
 
-  - [ ] 9.3. Add integration tests for complex update scenarios.
+  - [x] 9.3. Add integration tests for complex update scenarios.
 
-  - [ ] 9.4. Verify updates work correctly with pinned/unpinned sources.
+  - [x] 9.4. Verify updates work correctly with pinned/unpinned sources.
 
 - [ ] 10. CI/headless mode safeguards & security enforcement
 
