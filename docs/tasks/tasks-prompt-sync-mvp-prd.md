@@ -99,23 +99,23 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 2.6. Verify by running `go test ./internal/...`.
 
-- [ ] 3. Prompt pack resolver: discovery, Git fetching, and local cache
+- [x] 3. Prompt pack resolver: discovery, Git fetching, and local cache
 
-  - [ ] 3.1. Write contract test `internal/test/contract/git_fetcher_contract_test.go` describing expected `GitFetcher` interface (Clone, Update, CachedPath).
+  - [x] 3.1. Write contract test `internal/test/contract/git_fetcher_contract_test.go` describing expected `GitFetcher` interface (Clone, Update, CachedPath).
 
-  - [ ] 3.2. Stub `internal/git/fetcher.go` implementing the interface with no-op returns.
+  - [x] 3.2. Stub `internal/git/fetcher.go` implementing the interface with no-op returns.
 
-  - [ ] 3.3. Write unit tests for cloning into `$HOME/.prompt-sync/repos` using local fixture repos.
+  - [x] 3.3. Write unit tests for cloning into `$HOME/.prompt-sync/repos` using local fixture repos.
 
-  - [ ] 3.4. Implement **go-git** backend in `internal/git/fetcher.go`; handle offline mode.
+  - [x] 3.4. Implement **go-git** backend in `internal/git/fetcher.go`; handle offline mode.
 
-  - [ ] 3.5. Implement **exec-git** backend in `internal/git/fetcher_exec.go` that shells out to the system `git` binary with shallow/sparse clone support.
+  - [x] 3.5. Implement **exec-git** backend in `internal/git/fetcher_exec.go` that shells out to the system `git` binary with shallow/sparse clone support.
 
-  - [ ] 3.6. Add backend factory & auto-selection logic (repo-size threshold or explicit `--git-backend`, `PROMPT_SYNC_GIT_BACKEND`); update contract tests to run against both backends.
+  - [x] 3.6. Add backend factory & auto-selection logic (repo-size threshold or explicit `--git-backend`, `PROMPT_SYNC_GIT_BACKEND`); update contract tests to run against both backends.
 
-  - [ ] 3.7. Add support for overridable cache directory via `PROMPT_SYNC_CACHE_DIR` env var and `--cache-dir` flag; update unit & contract tests.
+  - [x] 3.7. Add support for overridable cache directory via `PROMPT_SYNC_CACHE_DIR` env var and `--cache-dir` flag; update unit & contract tests.
 
-  - [ ] 3.8. Verify by running `go test ./...` against both backends.
+  - [x] 3.8. Verify by running `go test ./...` against both backends.
 
 - [ ] 4. Adapter architecture & rendering engine (Cursor & Claude)
 

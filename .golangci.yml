@@ -36,3 +36,7 @@ issues:
     - linters:
         - typecheck
       text: "undefined: yaml"
+    # typecheck has issues with go-git
+    - linters:
+        - typecheck
+      text: "undefined: git"
