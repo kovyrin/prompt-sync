@@ -202,25 +202,25 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 7.4. Verify by adding prompts to a test project.
 
-- [ ] 8. Package lifecycle: `remove` command (removing prompts)
+- [x] 8. Package lifecycle: `remove` command (removing prompts)
 
-  - [ ] 8.1. Write unit tests in `internal/test/unit/remove_command_test.go` covering:
+  - [x] 8.1. Write unit tests in `internal/test/unit/remove_command_test.go` covering:
 
     - Removing existing prompts
     - Handling non-existent prompts gracefully
     - Cleaning up rendered files
     - Updating lock file
 
-  - [ ] 8.2. Implement `internal/cmd/remove.go`:
+  - [x] 8.2. Implement `internal/cmd/remove.go`:
 
     - Remove from Promptsfile
     - Clean up rendered files
     - Update .gitignore if needed
     - Trigger lock file update
 
-  - [ ] 8.3. Add integration tests for removal edge cases.
+  - [x] 8.3. Add integration tests for removal edge cases.
 
-  - [ ] 8.4. Verify removal doesn't break other prompts.
+  - [x] 8.4. Verify removal doesn't break other prompts.
 
 - [ ] 9. Package lifecycle: `update` command (updating existing prompts)
 
