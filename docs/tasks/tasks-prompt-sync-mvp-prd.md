@@ -22,6 +22,8 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 - `internal/adapter/adapter.go` – Shared adapter interface definition.
 - `internal/adapter/cursor/cursor_adapter.go` – Cursor adapter implementation.
 - `internal/adapter/claude/claude_adapter.go` – Claude adapter implementation.
+- `internal/test/unit/cursor_adapter_test.go` – Unit tests for Cursor adapter metadata merging.
+- `internal/test/unit/claude_adapter_test.go` – Unit tests for Claude adapter prefix resolution.
 
 - `internal/test/integration/install_workflow_test.go` – Integration tests for `install` + `verify` end-to-end.
 - `internal/workflow/install.go` – Install workflow orchestration.
@@ -117,21 +119,21 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 3.8. Verify by running `go test ./...` against both backends.
 
-- [ ] 4. Adapter architecture & rendering engine (Cursor & Claude)
+- [x] 4. Adapter architecture & rendering engine (Cursor & Claude)
 
-  - [ ] 4.1. Write contract test `internal/test/contract/adapter_contract_test.go` defining `Adapter` interface as per PRD.
+  - [x] 4.1. Write contract test `internal/test/contract/adapter_contract_test.go` defining `Adapter` interface as per PRD.
 
-  - [ ] 4.2. Stub `internal/adapter/adapter.go` with interface definition only.
+  - [x] 4.2. Stub `internal/adapter/adapter.go` with interface definition only.
 
-  - [ ] 4.3. Write unit tests for Cursor adapter metadata merge algorithm (defaults → per-file → front-matter).
+  - [x] 4.3. Write unit tests for Cursor adapter metadata merge algorithm (defaults → per-file → front-matter).
 
-  - [ ] 4.4. Implement `internal/adapter/cursor/cursor_adapter.go` to render prompt files into `.cursor/rules/_active/`.
+  - [x] 4.4. Implement `internal/adapter/cursor/cursor_adapter.go` to render prompt files into `.cursor/rules/_active/`.
 
-  - [ ] 4.5. Write unit tests for Claude adapter prefix resolution precedence.
+  - [x] 4.5. Write unit tests for Claude adapter prefix resolution precedence.
 
-  - [ ] 4.6. Implement `internal/adapter/claude/claude_adapter.go` to render prefixed markdown files.
+  - [x] 4.6. Implement `internal/adapter/claude/claude_adapter.go` to render prefixed markdown files.
 
-  - [ ] 4.7. Verify by running `go test ./internal/adapter/...`.
+  - [x] 4.7. Verify by running `go test ./internal/adapter/...`.
 
 - [ ] 5. Installation workflow: `install` & `verify` (lock file generation, .gitignore management, conflict detection)
 
