@@ -163,28 +163,93 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 5.9c. Execute `prompt-sync verify` on sample repo and confirm no drift detected.
 
-- [ ] 6. Package lifecycle commands: `add`, `remove`, `update`, `list`
+- [ ] 6. Package lifecycle: `list` command (read-only operations)
 
-  - [ ] 6.1. Write unit tests in `internal/test/unit/cli_commands_test.go` covering happy paths & error cases for each command.
+  - [ ] 6.1. Write unit tests in `internal/test/unit/list_command_test.go` covering:
 
-  - [ ] 6.2. Implement `internal/cmd/add.go` to modify `Promptsfile` and trigger install.
+    - Basic listing of installed prompts
+    - `--files` flag to show rendered file paths
+    - `--outdated` flag to show available updates
+    - JSON output format with `--json`
 
-  - [ ] 6.3. Implement `internal/cmd/remove.go` with safe removal & cleanup.
+  - [ ] 6.2. Implement `internal/cmd/list.go`:
 
-  - [ ] 6.4. Implement `internal/cmd/update.go` to bump unpinned branches and update lock file.
+    - Read from Promptsfile and lock file
+    - Display prompt sources, versions, and status
+    - Support multiple output formats (table, json)
 
-  - [ ] 6.5. Implement `internal/cmd/list.go` supporting `--outdated` & `--files` flags.
+  - [ ] 6.3. Add integration tests for `list` with various prompt configurations.
 
-  - [ ] 6.6. Verify by running `go test ./...` and invoking each command against sample repo.
+  - [ ] 6.4. Verify by running `go test ./...` and testing command outputs.
 
-- [ ] 7. CI/headless mode safeguards & security enforcement
+- [ ] 7. Package lifecycle: `add` command (adding new prompts)
 
-  - [ ] 7.1. Write failing system test `internal/test/system/ci_mode_system_test.go` ensuring `CI=true prompt-sync install` runs non-interactively and exits non-zero on conflict.
+  - [ ] 7.1. Write unit tests in `internal/test/unit/add_command_test.go` covering:
 
-  - [ ] 7.2. Implement `internal/ci/ci_guard.go` to detect `CI=true` or `--yes` and force non-interactive mode.
+    - Adding valid prompt sources
+    - Rejecting untrusted sources (without --allow-unknown)
+    - Handling duplicate prompt names
+    - Version/branch specification
 
-  - [ ] 7.3. Extend security level checks to block high-risk prompts in strict mode; add unit tests.
+  - [ ] 7.2. Implement `internal/cmd/add.go`:
 
-  - [ ] 7.4. Hook CI guard into root command persistent pre-run.
+    - Parse and validate source URL
+    - Update Promptsfile with new entry
+    - Trigger install workflow
+    - Handle `--no-install` flag
 
-  - [ ] 7.5. Verify by running `CI=true go test ./...` and executing `prompt-sync ci-install`.
+  - [ ] 7.3. Add integration tests for various add scenarios.
+
+  - [ ] 7.4. Verify by adding prompts to a test project.
+
+- [ ] 8. Package lifecycle: `remove` command (removing prompts)
+
+  - [ ] 8.1. Write unit tests in `internal/test/unit/remove_command_test.go` covering:
+
+    - Removing existing prompts
+    - Handling non-existent prompts gracefully
+    - Cleaning up rendered files
+    - Updating lock file
+
+  - [ ] 8.2. Implement `internal/cmd/remove.go`:
+
+    - Remove from Promptsfile
+    - Clean up rendered files
+    - Update .gitignore if needed
+    - Trigger lock file update
+
+  - [ ] 8.3. Add integration tests for removal edge cases.
+
+  - [ ] 8.4. Verify removal doesn't break other prompts.
+
+- [ ] 9. Package lifecycle: `update` command (updating existing prompts)
+
+  - [ ] 9.1. Write unit tests in `internal/test/unit/update_command_test.go` covering:
+
+    - Updating all prompts vs. specific ones
+    - Respecting version constraints
+    - Handling breaking changes warnings
+    - Lock file updates
+
+  - [ ] 9.2. Implement `internal/cmd/update.go`:
+
+    - Check for available updates
+    - Handle version resolution
+    - Update Promptsfile for unpinned sources
+    - Regenerate lock file with new hashes
+
+  - [ ] 9.3. Add integration tests for complex update scenarios.
+
+  - [ ] 9.4. Verify updates work correctly with pinned/unpinned sources.
+
+- [ ] 10. CI/headless mode safeguards & security enforcement
+
+  - [ ] 10.1. Write failing system test `internal/test/system/ci_mode_system_test.go` ensuring `CI=true prompt-sync install` runs non-interactively and exits non-zero on conflict.
+
+  - [ ] 10.2. Implement `internal/ci/ci_guard.go` to detect `CI=true` or `--yes` and force non-interactive mode.
+
+  - [ ] 10.3. Extend security level checks to block high-risk prompts in strict mode; add unit tests.
+
+  - [ ] 10.4. Hook CI guard into root command persistent pre-run.
+
+  - [ ] 10.5. Verify by running `CI=true go test ./...` and executing `prompt-sync ci-install`.
