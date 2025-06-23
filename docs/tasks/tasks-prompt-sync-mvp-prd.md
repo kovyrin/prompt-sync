@@ -135,6 +135,10 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 4.7. Verify by running `go test ./internal/adapter/...`.
 
+  - [x] 4.8. Ensure Cursor adapter preserves MDC frontmatter:
+    - [x] 4.8a. Add unit tests to verify frontmatter preservation
+    - [x] 4.8b. Add integration test with MDC files containing frontmatter
+
 - [x] 5. Installation workflow: `install` & `verify` (lock file generation, .gitignore management, conflict detection)
 
   - [x] 5.1. Write failing integration test `internal/test/integration/install_workflow_test.go` exercising `prompt-sync install` end-to-end with sample packs.

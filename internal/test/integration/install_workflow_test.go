@@ -3,6 +3,7 @@ package integration_test
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -93,6 +94,100 @@ adapters:
 		require.NoError(t, err)
 
 		// TODO: Run install and verify personal > project > org precedence
+	})
+
+	t.Run("preserves frontmatter in MDC files", func(t *testing.T) {
+		workspace := t.TempDir()
+
+		// Create test repo with MDC file containing frontmatter
+		testRepo := filepath.Join(t.TempDir(), "frontmatter-test")
+		require.NoError(t, os.MkdirAll(filepath.Join(testRepo, "prompts"), 0755))
+
+		// Create MDC file with frontmatter
+		mdcContent := `---
+title: Test Rule with Frontmatter
+priority: high
+tags:
+  - testing
+  - mdc
+custom_settings:
+  enabled: true
+  level: strict
+---
+
+# Test Rule
+
+This MDC file has frontmatter that should be preserved.
+
+::alert{type="info"}
+MDC components should also work
+::`
+
+		mdcPath := filepath.Join(testRepo, "prompts", "test-rule.mdc")
+		require.NoError(t, os.WriteFile(mdcPath, []byte(mdcContent), 0644))
+
+		// Initialize git repo
+		cmd := exec.Command("git", "init")
+		cmd.Dir = testRepo
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "config", "user.email", "test@example.com")
+		cmd.Dir = testRepo
+		cmd.Run()
+
+		cmd = exec.Command("git", "config", "user.name", "Test User")
+		cmd.Dir = testRepo
+		cmd.Run()
+
+		cmd = exec.Command("git", "add", ".")
+		cmd.Dir = testRepo
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "commit", "-m", "Initial commit")
+		cmd.Dir = testRepo
+		require.NoError(t, cmd.Run())
+
+		// Create Promptsfile
+		promptsfile := fmt.Sprintf(`sources:
+  - file://%s#master
+
+adapters:
+  cursor:
+    enabled: true
+`, testRepo)
+
+		require.NoError(t, os.WriteFile(filepath.Join(workspace, "Promptsfile"), []byte(promptsfile), 0644))
+
+		// Run install
+		installer, err := workflow.New(workflow.InstallOptions{
+			WorkspaceDir: workspace,
+			AllowUnknown: true,
+		})
+		require.NoError(t, err)
+
+		err = installer.Execute()
+		require.NoError(t, err)
+
+		// Verify the rendered file preserves frontmatter
+		renderedPath := filepath.Join(workspace, ".cursor/rules/_active/test-rule.mdc")
+		assert.FileExists(t, renderedPath)
+
+		renderedContent, err := os.ReadFile(renderedPath)
+		require.NoError(t, err)
+
+		// Should contain all the frontmatter
+		assert.Contains(t, string(renderedContent), "title: Test Rule with Frontmatter")
+		assert.Contains(t, string(renderedContent), "priority: high")
+		assert.Contains(t, string(renderedContent), "tags:")
+		assert.Contains(t, string(renderedContent), "- testing")
+		assert.Contains(t, string(renderedContent), "- mdc")
+		assert.Contains(t, string(renderedContent), "custom_settings:")
+		assert.Contains(t, string(renderedContent), "enabled: true")
+		assert.Contains(t, string(renderedContent), "level: strict")
+
+		// Should also contain the body content
+		assert.Contains(t, string(renderedContent), "# Test Rule")
+		assert.Contains(t, string(renderedContent), "::alert{type=\"info\"}")
 	})
 
 	t.Run("detects and reports conflicts", func(t *testing.T) {
