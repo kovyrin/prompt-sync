@@ -93,9 +93,9 @@ func TestGitFetcherContract(t *testing.T) {
 }
 
 func testFetcherContract(t *testing.T, backend git.Backend) {
-	fetcher := git.NewFetcherWithBackend(git.Options{
-		CacheDir: t.TempDir(),
-	}, backend)
+	fetcher := git.NewFetcherWithBackend(backend,
+		git.WithCacheDir(t.TempDir()),
+	)
 
 	t.Run("Clone creates local cache", func(t *testing.T) {
 		repoURL := "https://github.com/golang/example.git"
@@ -177,10 +177,10 @@ func testFetcherContract(t *testing.T, backend git.Backend) {
 	})
 
 	t.Run("Offline mode prevents network access", func(t *testing.T) {
-		offlineFetcher := git.NewFetcherWithBackend(git.Options{
-			CacheDir: t.TempDir(),
-			Offline:  true,
-		}, backend)
+		offlineFetcher := git.NewFetcherWithBackend(backend,
+			git.WithCacheDir(t.TempDir()),
+			git.WithOfflineMode(),
+		)
 
 		repoURL := "https://github.com/some/nonexistent-repo.git"
 		ref := "main"

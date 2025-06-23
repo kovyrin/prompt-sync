@@ -135,25 +135,29 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 4.7. Verify by running `go test ./internal/adapter/...`.
 
-- [ ] 5. Installation workflow: `install` & `verify` (lock file generation, .gitignore management, conflict detection)
+- [x] 5. Installation workflow: `install` & `verify` (lock file generation, .gitignore management, conflict detection)
 
-  - [ ] 5.1. Write failing integration test `internal/test/integration/install_workflow_test.go` exercising `prompt-sync install` end-to-end with sample packs.
+  - [x] 5.1. Write failing integration test `internal/test/integration/install_workflow_test.go` exercising `prompt-sync install` end-to-end with sample packs.
 
-  - [ ] 5.2. Implement `internal/gitignore/manager.go` to insert/update managed block idempotently; add unit tests.
+  - [x] 5.2. Implement `internal/gitignore/manager.go` to insert/update managed block idempotently; add unit tests.
 
-  - [ ] 5.3. Implement overlay precedence logic (personal > project > org) when staging packs for rendering; add unit & integration tests.
+  - [x] 5.3. Implement overlay precedence logic (personal > project > org) when staging packs for rendering; add unit & integration tests.
 
-  - [ ] 5.4. Implement `internal/conflict/detector.go` scanning rendered outputs for duplicate basenames & hash drift; add tests.
+  - [x] 5.4. Implement `internal/conflict/detector.go` scanning rendered outputs for duplicate basenames & hash drift; add tests.
 
-  - [ ] 5.5. Implement `internal/lock/lock_writer.go` to write/update `Promptsfile.lock`; add tests for deterministic hashes.
+  - [x] 5.5. Implement `internal/lock/lock_writer.go` to write/update `Promptsfile.lock`; add tests for deterministic hashes.
 
-  - [ ] 5.6. Implement strict-mode handling in install workflow (`--strict` flag or `CI=true`) to convert warnings into errors; update tests.
+  - [x] 5.6. Implement strict-mode handling in install workflow (`--strict` flag or `CI=true`) to convert warnings into errors; update tests.
 
-  - [ ] 5.7. Implement `internal/cmd/verify.go` exposing standalone `verify` command aliasing install-verify mode; add CLI tests.
+  - [x] 5.7. Implement `internal/cmd/verify.go` exposing standalone `verify` command aliasing install-verify mode; add CLI tests.
 
-  - [ ] 5.8. Implement `internal/workflow/install.go` orchestrating resolver → adapters → conflict scan → lock write; include `Verify` mode.
+  - [x] 5.8. Implement `internal/workflow/install.go` orchestrating resolver → adapters → conflict scan → lock write; include `Verify` mode.
 
-  - [ ] 5.9. Verify by running `go test ./...` and executing `prompt-sync install --strict` and `prompt-sync verify` on sample repo.
+  - [x] 5.9a. Verify by running `go test ./...` on all test suites.
+
+  - [x] 5.9b. Execute `prompt-sync install --strict` on sample repo and verify successful installation.
+
+  - [x] 5.9c. Execute `prompt-sync verify` on sample repo and confirm no drift detected.
 
 - [ ] 6. Package lifecycle commands: `add`, `remove`, `update`, `list`
 

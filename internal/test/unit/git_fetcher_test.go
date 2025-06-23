@@ -88,9 +88,9 @@ func TestGitFetcher_LocalRepo(t *testing.T) {
 	// Create a test repository
 	testRepo := createTestRepo(t, "test-repo")
 
-	fetcher := git.NewFetcher(git.Options{
-		CacheDir: t.TempDir(),
-	})
+	fetcher := git.NewFetcher(
+		git.WithCacheDir(t.TempDir()),
+	)
 
 	t.Run("Clone local repository", func(t *testing.T) {
 		path, err := fetcher.Clone(testRepo, "master")
@@ -142,19 +142,19 @@ func TestGitFetcher_LocalRepo(t *testing.T) {
 	t.Run("Offline mode uses cache", func(t *testing.T) {
 		// First clone with online fetcher
 		cacheDir := t.TempDir()
-		onlineFetcher := git.NewFetcher(git.Options{
-			CacheDir: cacheDir,
-		})
+		onlineFetcher := git.NewFetcher(
+			git.WithCacheDir(cacheDir),
+		)
 		path1, err := onlineFetcher.Clone(testRepo, "master")
 		if err != nil {
 			t.Fatalf("Online clone failed: %v", err)
 		}
 
 		// Now try offline mode with same cache dir
-		offlineFetcher := git.NewFetcher(git.Options{
-			CacheDir: cacheDir,
-			Offline:  true,
-		})
+		offlineFetcher := git.NewFetcher(
+			git.WithCacheDir(cacheDir),
+			git.WithOfflineMode(),
+		)
 
 		path2, err := offlineFetcher.Clone(testRepo, "master")
 		if err != nil {
@@ -175,7 +175,7 @@ func TestGitFetcher_CacheDir(t *testing.T) {
 		os.Setenv("PROMPT_SYNC_CACHE_DIR", customCache)
 		t.Cleanup(func() { os.Unsetenv("PROMPT_SYNC_CACHE_DIR") })
 
-		fetcher := git.NewFetcher(git.Options{})
+		fetcher := git.NewFetcher()
 		path, err := fetcher.Clone(testRepo, "master")
 		if err != nil {
 			t.Fatalf("Clone failed: %v", err)
@@ -194,9 +194,9 @@ func TestGitFetcher_CacheDir(t *testing.T) {
 		os.Setenv("PROMPT_SYNC_CACHE_DIR", envCache)
 		t.Cleanup(func() { os.Unsetenv("PROMPT_SYNC_CACHE_DIR") })
 
-		fetcher := git.NewFetcher(git.Options{
-			CacheDir: explicitCache,
-		})
+		fetcher := git.NewFetcher(
+			git.WithCacheDir(explicitCache),
+		)
 		path, err := fetcher.Clone(testRepo, "master")
 		if err != nil {
 			t.Fatalf("Clone failed: %v", err)

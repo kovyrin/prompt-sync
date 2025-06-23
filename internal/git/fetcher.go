@@ -33,6 +33,10 @@ type Fetcher interface {
 	// CachedPath returns the local path for a cached repository, if it exists.
 	// The bool indicates whether the repo is cached.
 	CachedPath(repoURL, ref string) (string, bool)
+
+	// CloneOrUpdate fetches a repository at the given ref and returns the local path and commit hash.
+	// If already cached, it updates and returns the existing path.
+	CloneOrUpdate(repoURL, ref string) (path string, commit string, err error)
 }
 
 // fetcher is the go-git implementation of the Fetcher interface.
@@ -41,7 +45,11 @@ type fetcher struct {
 }
 
 // NewFetcher creates a new GitFetcher with the given options.
-func NewFetcher(opts Options) Fetcher {
+func NewFetcher(options ...Option) Fetcher {
+	opts := Options{}
+	for _, opt := range options {
+		opt(&opts)
+	}
 	opts.CacheDir = ResolveCacheDir(opts.CacheDir)
 	return &fetcher{options: opts}
 }
@@ -234,6 +242,36 @@ func (f *fetcher) CachedPath(repoURL, ref string) (string, bool) {
 	_ = repo
 
 	return repoPath, true
+}
+
+// CloneOrUpdate fetches a repository at the given ref and returns the local path and commit hash.
+func (f *fetcher) CloneOrUpdate(repoURL, ref string) (string, string, error) {
+	// First try to clone (which will reuse existing if cached)
+	path, err := f.Clone(repoURL, ref)
+	if err != nil {
+		return "", "", err
+	}
+
+	// If not offline and repo already existed, try to update
+	if !f.options.Offline {
+		if cached, _ := f.CachedPath(repoURL, ref); cached != "" {
+			// Ignore update errors in case we're on a detached head
+			_ = f.Update(repoURL, ref)
+		}
+	}
+
+	// Get the current commit hash
+	repo, err := git.PlainOpen(path)
+	if err != nil {
+		return path, "", fmt.Errorf("open repo to get commit: %w", err)
+	}
+
+	head, err := repo.Head()
+	if err != nil {
+		return path, "", fmt.Errorf("get HEAD commit: %w", err)
+	}
+
+	return path, head.Hash().String(), nil
 }
 
 // isCommitHash checks if a string looks like a git commit hash.

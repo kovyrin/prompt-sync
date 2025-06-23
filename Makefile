@@ -1,4 +1,4 @@
-.PHONY: test lint watch install-tools help
+.PHONY: test lint watch install-tools build help
 
 # Set the default goal to `help` so running plain `make` shows the menu
 .DEFAULT_GOAL := help
@@ -19,6 +19,14 @@ help: ## Show this help screen
 # --------------------------------------
 test: ## Run full Go test suite (`go test ./...`)
 	go test ./...
+
+# Build the prompt-sync binary
+# Usage: make build
+# --------------------------------------
+# Builds the CLI binary into bin/prompt-sync
+# --------------------------------------
+build: ## Build the prompt-sync binary
+	go build -o bin/prompt-sync ./cmd/prompt-sync
 
 # Run the aggregated linter suite via golangci-lint
 # Usage: make lint

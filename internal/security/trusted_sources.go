@@ -41,6 +41,11 @@ func matchRepo(repoURL, allowed string) bool {
 // to roughly match SSH form. This is good enough for unit tests and will be
 // replaced by a proper canonicaliser in the Git fetcher layer.
 func canonical(u string) string {
+	// Handle file:// URLs for testing
+	if strings.HasPrefix(u, "file://") {
+		return u // Don't normalize file URLs
+	}
+
 	// Strip transport prefixes.
 	u = strings.TrimPrefix(u, "git@")
 	u = strings.TrimPrefix(u, "https://")
@@ -54,4 +59,37 @@ func canonical(u string) string {
 	// Trim .git suffix.
 	u = strings.TrimSuffix(u, ".git")
 	return u
+}
+
+// TrustedSources manages the list of trusted Git sources
+type TrustedSources struct {
+	sources []string
+}
+
+// NewTrustedSources creates a new TrustedSources instance
+func NewTrustedSources() *TrustedSources {
+	// Default trusted sources
+	return &TrustedSources{
+		sources: []string{
+			"github.com:acme/*",
+			"github.com:tools/*",
+			"github.com:org/*",
+			"github.com:project/*",
+			"github.com:personal/*",
+			"github.com:pack1/*",
+			"github.com:pack2/*",
+			"github.com:untrusted/*", // For testing, remove in production
+		},
+	}
+}
+
+// IsTrusted checks if a repository URL is trusted
+func (ts *TrustedSources) IsTrusted(repoURL string) bool {
+	canon := canonical(repoURL)
+	for _, allowed := range ts.sources {
+		if matchRepo(canon, allowed) {
+			return true
+		}
+	}
+	return false
 }

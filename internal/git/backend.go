@@ -17,7 +17,7 @@ const (
 )
 
 // NewFetcherWithBackend creates a GitFetcher with the specified backend.
-func NewFetcherWithBackend(opts Options, backend Backend) Fetcher {
+func NewFetcherWithBackend(backend Backend, options ...Option) Fetcher {
 	// Allow environment override
 	if envBackend := os.Getenv("PROMPT_SYNC_GIT_BACKEND"); envBackend != "" {
 		switch envBackend {
@@ -30,14 +30,14 @@ func NewFetcherWithBackend(opts Options, backend Backend) Fetcher {
 
 	switch backend {
 	case BackendExec:
-		return NewExecFetcher(opts)
+		return NewExecFetcher(options...)
 	case BackendGoGit:
-		return NewFetcher(opts)
+		return NewFetcher(options...)
 	case BackendAuto:
 		// For now, default to go-git for better portability
 		// In the future, could check repo size or other heuristics
-		return NewFetcher(opts)
+		return NewFetcher(options...)
 	default:
-		return NewFetcher(opts)
+		return NewFetcher(options...)
 	}
 }
