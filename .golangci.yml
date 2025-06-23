@@ -31,4 +31,8 @@ issues:
     - third_party
 
   # Put any false-positives here
-  exclude-rules: []
+  exclude-rules:
+    # typecheck has issues with gopkg.in/yaml.v3
+    - linters:
+        - typecheck
+      text: "undefined: yaml"

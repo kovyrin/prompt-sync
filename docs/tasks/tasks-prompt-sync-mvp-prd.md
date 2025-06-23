@@ -85,19 +85,19 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 1.7. Verify by running `go test ./...` and `prompt-sync init --help`.
 
-- [ ] 2. Configuration loading & trusted source enforcement
+- [x] 2. Configuration loading & trusted source enforcement
 
-  - [ ] 2.1. Write failing unit test `internal/test/unit/config_loader_test.go` for loading default sources from `Promptsfile` & user config precedence.
+  - [x] 2.1. Write failing unit test `internal/test/unit/config_loader_test.go` for loading default sources from `Promptsfile` & user config precedence.
 
-  - [ ] 2.2. Write contract test `internal/test/unit/trusted_sources_test.go` defining expected rejection of unknown Git URLs.
+  - [x] 2.2. Write contract test `internal/test/unit/trusted_sources_test.go` defining expected rejection of unknown Git URLs.
 
-  - [ ] 2.3. Implement `internal/config/loader.go` with YAML parsing and precedence rules.
+  - [x] 2.3. Implement `internal/config/loader.go` with YAML parsing and precedence rules.
 
-  - [ ] 2.4. Implement `internal/security/trusted_sources.go` enforcing allow-list with meaningful errors.
+  - [x] 2.4. Implement `internal/security/trusted_sources.go` enforcing allow-list with meaningful errors.
 
-  - [ ] 2.5. Add edge-case tests (URL redirects, wildcards, `--allow-unknown`).
+  - [x] 2.5. Add edge-case tests (URL redirects, wildcards, `--allow-unknown`).
 
-  - [ ] 2.6. Verify by running `go test ./internal/...`.
+  - [x] 2.6. Verify by running `go test ./internal/...`.
 
 - [ ] 3. Prompt pack resolver: discovery, Git fetching, and local cache
 
