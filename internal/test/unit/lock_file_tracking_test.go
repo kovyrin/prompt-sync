@@ -1,0 +1,196 @@
+package unit_test
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/kovyrin/prompt-sync/internal/lock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestLockFileTracking(t *testing.T) {
+	t.Run("tracks source to output file mapping", func(t *testing.T) {
+		workspace := t.TempDir()
+		writer := lock.New(workspace)
+
+		// Create a lock file with source path mappings
+		sources := []lock.Source{
+			{
+				URL:    "https://github.com/acme/prompts.git",
+				Ref:    "v1.0.0",
+				Commit: "abc123",
+				Files: []lock.File{
+					{
+						Path:       ".cursor/rules/_active/authentication.md",
+						SourcePath: "prompts/security/auth.md",
+						Hash:       "sha256:hash1",
+					},
+					{
+						Path:       ".cursor/rules/_active/validation.md",
+						SourcePath: "prompts/security/validate.md",
+						Hash:       "sha256:hash2",
+					},
+					{
+						Path:       ".claude/commands/acme-security.md",
+						SourcePath: "commands/security.md",
+						Hash:       "sha256:hash3",
+					},
+				},
+			},
+			{
+				URL:    "https://github.com/team/standards.git",
+				Commit: "def456",
+				Files: []lock.File{
+					{
+						Path:       ".cursor/rules/_active/style.md",
+						SourcePath: "rules/backend/golang/style.md",
+						Hash:       "sha256:hash4",
+					},
+				},
+			},
+		}
+
+		err := writer.Write(sources)
+		require.NoError(t, err)
+
+		// Read back and verify source paths are preserved
+		lockData, err := writer.Read()
+		require.NoError(t, err)
+		require.NotNil(t, lockData)
+
+		// Check first source
+		acmeSource := lockData.Sources[0]
+		assert.Equal(t, "https://github.com/acme/prompts.git", acmeSource.URL)
+		assert.Len(t, acmeSource.Files, 3)
+
+		// Verify source path mappings - files are sorted by output path
+		// So we need to check by finding the right file
+		sourcePathMap := make(map[string]string)
+		for _, file := range acmeSource.Files {
+			sourcePathMap[file.Path] = file.SourcePath
+		}
+
+		assert.Equal(t, "commands/security.md", sourcePathMap[".claude/commands/acme-security.md"])
+		assert.Equal(t, "prompts/security/auth.md", sourcePathMap[".cursor/rules/_active/authentication.md"])
+		assert.Equal(t, "prompts/security/validate.md", sourcePathMap[".cursor/rules/_active/validation.md"])
+	})
+
+	t.Run("GetFilesBySource returns files with source paths", func(t *testing.T) {
+		workspace := t.TempDir()
+		writer := lock.New(workspace)
+
+		sources := []lock.Source{
+			{
+				URL:    "https://github.com/org/prompts.git#v2.0.0",
+				Commit: "xyz789",
+				Files: []lock.File{
+					{
+						Path:       ".cursor/rules/_active/new-feature.md",
+						SourcePath: "rules/features/new.md",
+						Hash:       "sha256:hash5",
+					},
+				},
+			},
+		}
+
+		err := writer.Write(sources)
+		require.NoError(t, err)
+
+		// Get files by source (without version)
+		files, err := writer.GetFilesBySource("https://github.com/org/prompts.git")
+		require.NoError(t, err)
+		assert.Len(t, files, 1)
+		assert.Equal(t, "rules/features/new.md", files[0].SourcePath)
+
+		// Get files by source (with version)
+		files, err = writer.GetFilesBySource("https://github.com/org/prompts.git#v2.0.0")
+		require.NoError(t, err)
+		assert.Len(t, files, 1)
+		assert.Equal(t, "rules/features/new.md", files[0].SourcePath)
+	})
+
+	t.Run("GetSourceMapping returns source to output path map", func(t *testing.T) {
+		workspace := t.TempDir()
+		writer := lock.New(workspace)
+
+		sources := []lock.Source{
+			{
+				URL:    "https://github.com/enterprise/prompts.git",
+				Commit: "commit1",
+				Files: []lock.File{
+					{
+						Path:       ".cursor/rules/_active/auth.md",
+						SourcePath: "prompts/authentication.md",
+						Hash:       "sha256:hash1",
+					},
+					{
+						Path:       ".cursor/rules/_active/db.md",
+						SourcePath: "prompts/database.md",
+						Hash:       "sha256:hash2",
+					},
+					{
+						Path:       ".claude/commands/ent-auth.md",
+						SourcePath: "prompts/authentication.md", // Same source, different output
+						Hash:       "sha256:hash3",
+					},
+				},
+			},
+		}
+
+		err := writer.Write(sources)
+		require.NoError(t, err)
+
+		// Get source mapping
+		mapping, err := writer.GetSourceMapping("https://github.com/enterprise/prompts.git")
+		require.NoError(t, err)
+		assert.Len(t, mapping, 2) // Two unique source paths
+
+		// Verify mapping (note: if multiple outputs from same source, one will win)
+		// In this case we have prompts/authentication.md mapping to two outputs
+		authMapping := mapping["prompts/authentication.md"]
+		assert.True(t, authMapping == ".cursor/rules/_active/auth.md" || authMapping == ".claude/commands/ent-auth.md",
+			"Expected authentication.md to map to one of the outputs")
+		assert.Equal(t, ".cursor/rules/_active/db.md", mapping["prompts/database.md"])
+	})
+
+	t.Run("backwards compatibility with files without source paths", func(t *testing.T) {
+		workspace := t.TempDir()
+		lockPath := filepath.Join(workspace, "Promptsfile.lock")
+
+		// Write an old-style lock file without source paths
+		oldLockContent := `# Promptsfile.lock
+# Generated by prompt-sync
+# DO NOT EDIT MANUALLY
+
+version: "1.0"
+generated: 2024-01-01T00:00:00Z
+sources:
+  - url: https://github.com/old/prompts.git
+    commit: old123
+    files:
+      - path: .cursor/rules/_active/old.md
+        hash: sha256:oldhash
+`
+		err := os.WriteFile(lockPath, []byte(oldLockContent), 0644)
+		require.NoError(t, err)
+
+		// Read it with new code
+		writer := lock.New(workspace)
+		lockData, err := writer.Read()
+		require.NoError(t, err)
+		require.NotNil(t, lockData)
+
+		// Should read successfully with empty source paths
+		assert.Len(t, lockData.Sources, 1)
+		assert.Len(t, lockData.Sources[0].Files, 1)
+		assert.Equal(t, ".cursor/rules/_active/old.md", lockData.Sources[0].Files[0].Path)
+		assert.Equal(t, "", lockData.Sources[0].Files[0].SourcePath) // Empty, not error
+
+		// GetSourceMapping should work with empty result
+		mapping, err := writer.GetSourceMapping("https://github.com/old/prompts.git")
+		require.NoError(t, err)
+		assert.Len(t, mapping, 0) // No mappings for old files
+	})
+}

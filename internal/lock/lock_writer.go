@@ -24,8 +24,9 @@ type Source struct {
 
 // File represents a file with its hash
 type File struct {
-	Path string `yaml:"path"`
-	Hash string `yaml:"hash"`
+	Path       string `yaml:"path"`   // Output path (rendered file location)
+	SourcePath string `yaml:"source"` // Source path in the repository
+	Hash       string `yaml:"hash"`   // Hash of the rendered file
 }
 
 // Lock represents the complete lock file structure
@@ -157,4 +158,45 @@ func (w *Writer) Exists() bool {
 	lockPath := filepath.Join(w.workspaceDir, "Promptsfile.lock")
 	_, err := os.Stat(lockPath)
 	return err == nil
+}
+
+// GetFilesBySource returns all files for a specific source URL
+func (w *Writer) GetFilesBySource(sourceURL string) ([]File, error) {
+	lock, err := w.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	if lock == nil {
+		return nil, nil
+	}
+
+	// Extract base URL (remove ref if present)
+	baseURL := strings.Split(sourceURL, "#")[0]
+
+	for _, source := range lock.Sources {
+		sourceBase := strings.Split(source.URL, "#")[0]
+		if sourceBase == baseURL {
+			return source.Files, nil
+		}
+	}
+
+	return nil, nil
+}
+
+// GetSourceMapping returns a map of source paths to output paths for a specific source
+func (w *Writer) GetSourceMapping(sourceURL string) (map[string]string, error) {
+	files, err := w.GetFilesBySource(sourceURL)
+	if err != nil {
+		return nil, err
+	}
+
+	mapping := make(map[string]string)
+	for _, file := range files {
+		if file.SourcePath != "" {
+			mapping[file.SourcePath] = file.Path
+		}
+	}
+
+	return mapping, nil
 }

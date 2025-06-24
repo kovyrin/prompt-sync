@@ -124,7 +124,7 @@ func TestRemoveCommand(t *testing.T) {
 		output, err := cmd.CombinedOutput()
 		require.Error(t, err, "expected error when Promptsfile doesn't exist")
 		assert.Contains(t, string(output), "Promptsfile not found")
-		assert.Contains(t, string(output), "prompt-sync init")
+		assert.Contains(t, string(output), ".ai/Promptsfile") // The error now shows searched paths
 	})
 
 	t.Run("remove last source shows cleanup hint", func(t *testing.T) {

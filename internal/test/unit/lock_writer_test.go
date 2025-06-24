@@ -23,8 +23,8 @@ func TestLockWriter(t *testing.T) {
 				Ref:    "v2.0.0",
 				Commit: "def456",
 				Files: []lock.File{
-					{Path: "rules/z-file.md", Hash: "sha256:hash3"},
-					{Path: "rules/a-file.md", Hash: "sha256:hash4"},
+					{Path: "rules/z-file.md", SourcePath: "prompts/file-z.md", Hash: "sha256:hash3"},
+					{Path: "rules/a-file.md", SourcePath: "prompts/file-a.md", Hash: "sha256:hash4"},
 				},
 			},
 			{
@@ -32,8 +32,8 @@ func TestLockWriter(t *testing.T) {
 				Ref:    "v1.0.0",
 				Commit: "abc123",
 				Files: []lock.File{
-					{Path: "rules/file2.md", Hash: "sha256:hash2"},
-					{Path: "rules/file1.md", Hash: "sha256:hash1"},
+					{Path: "rules/file2.md", SourcePath: "rules/source2.md", Hash: "sha256:hash2"},
+					{Path: "rules/file1.md", SourcePath: "rules/source1.md", Hash: "sha256:hash1"},
 				},
 			},
 		}
@@ -87,7 +87,7 @@ func TestLockWriter(t *testing.T) {
 				Ref:    "v1.0.0",
 				Commit: "abc123",
 				Files: []lock.File{
-					{Path: "rules/file1.md", Hash: "sha256:hash1"},
+					{Path: "rules/file1.md", SourcePath: "prompts/source1.md", Hash: "sha256:hash1"},
 				},
 			},
 		}
@@ -110,6 +110,7 @@ func TestLockWriter(t *testing.T) {
 		assert.Equal(t, "abc123", source.Commit)
 		assert.Len(t, source.Files, 1)
 		assert.Equal(t, "rules/file1.md", source.Files[0].Path)
+		assert.Equal(t, "prompts/source1.md", source.Files[0].SourcePath)
 		assert.Equal(t, "sha256:hash1", source.Files[0].Hash)
 	})
 
@@ -150,15 +151,15 @@ func TestLockWriter(t *testing.T) {
 				URL:    "https://github.com/org/prompts1.git",
 				Commit: "abc123",
 				Files: []lock.File{
-					{Path: ".cursor/rules/_active/file1.md", Hash: "sha256:hash1"},
-					{Path: ".cursor/rules/_active/file2.md", Hash: "sha256:hash2"},
+					{Path: ".cursor/rules/_active/file1.md", SourcePath: "rules/file1.md", Hash: "sha256:hash1"},
+					{Path: ".cursor/rules/_active/file2.md", SourcePath: "rules/file2.md", Hash: "sha256:hash2"},
 				},
 			},
 			{
 				URL:    "https://github.com/org/prompts2.git",
 				Commit: "def456",
 				Files: []lock.File{
-					{Path: ".claude/commands/prefix-cmd.md", Hash: "sha256:hash3"},
+					{Path: ".claude/commands/prefix-cmd.md", SourcePath: "commands/cmd.md", Hash: "sha256:hash3"},
 				},
 			},
 		}

@@ -490,12 +490,21 @@ prompt-sync update --dry-run
     - Better error messages showing exact conflict paths
     - **Implementation hint:** Add `preserve_structure: true` option to adapter config
 
-  - [ ] 11.5. Add file tracking to lock file
+  - [x] 11.5. Add file tracking to lock file
     - Include rendered file paths in lock file
     - Track source file to output file mapping
     - Enable proper cleanup on remove/update
     - Support drift detection at file level
     - **Implementation hint:** Extend lock file format to include `files:` section per source
+    - **Implementation completed (2025-06-24):**
+      - Extended `lock.File` struct to include `SourcePath` field
+      - Updated install workflow to populate source paths when creating lock entries
+      - Enhanced remove command to show source mappings during cleanup
+      - Added helper methods `GetFilesBySource()` and `GetSourceMapping()`
+      - Created comprehensive unit tests in `lock_file_tracking_test.go`
+      - Ensured backwards compatibility with old lock files
+      - Created documentation in `docs/lock-file-format.md`
+      - Files are now tracked with full source-to-output mapping
 
   **Testing Notes:**
 

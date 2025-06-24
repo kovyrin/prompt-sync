@@ -154,13 +154,37 @@ func cleanupRenderedFiles(workDir, source string, lockData *lock.Lock) error {
 				if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
 					// Continue trying to delete other files
 					fmt.Printf("Warning: could not delete %s: %v\n", filePath, err)
+				} else if err == nil && file.SourcePath != "" {
+					// Log successful removal with source mapping
+					fmt.Printf("  Removed %s (from %s)\n", file.Path, file.SourcePath)
 				}
 			}
+			// Try to clean up empty directories
+			cleanupEmptyDirs(workDir, lockedSource.Files)
 			break
 		}
 	}
 
 	return nil
+}
+
+// cleanupEmptyDirs attempts to remove empty directories after file cleanup
+func cleanupEmptyDirs(workDir string, files []lock.File) {
+	dirs := make(map[string]bool)
+
+	// Collect all directories that contained files
+	for _, file := range files {
+		dir := filepath.Dir(filepath.Join(workDir, file.Path))
+		for dir != workDir && dir != "." {
+			dirs[dir] = true
+			dir = filepath.Dir(dir)
+		}
+	}
+
+	// Try to remove directories (will fail if not empty)
+	for dir := range dirs {
+		_ = os.Remove(dir) // Ignore errors - directory might not be empty
+	}
 }
 
 func updateLockFile(lockWriter *lock.Writer, lockData *lock.Lock, source string) error {

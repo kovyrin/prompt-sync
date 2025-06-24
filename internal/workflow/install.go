@@ -221,8 +221,9 @@ func (i *Installer) Execute() error {
 				}
 
 				lockFiles = append(lockFiles, lock.File{
-					Path: outputPath,
-					Hash: hash,
+					Path:       outputPath,
+					SourcePath: file,
+					Hash:       hash,
 				})
 			}
 		}
