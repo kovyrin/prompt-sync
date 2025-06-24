@@ -7,13 +7,21 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 **Tasks Completed in This Session:**
 
 - Task 11.2: Implemented version switching cleanup
+
   - Files from old versions are now automatically removed when updating to new versions
   - Added comprehensive unit and integration tests
   - Fixed the real-world test to reflect the new behavior
 
+- Task 12: Configurable Promptsfile location
+  - Added `config.FindPromptsfilePath()` helper
+  - CLI now searches `$PROMPT_SYNC_DIR`, project root, then `.ai/`
+  - Installer and lock writer use Promptsfile directory automatically
+  - All commands (`install`, `list`, `add`, `remove`, `update`) updated accordingly
+  - Backwards-compatible: legacy root Promptsfile continues to work
+
 **Repository Status:**
 
-- 7 commits ahead of origin/main
+- 8 commits ahead of origin/main
 - All tests passing (`make test`)
 - Linter clean (`make lint`)
 - Files modified:
@@ -482,3 +490,9 @@ prompt-sync update --dry-run
   - The `real_world_test.go` exposes most of the issues listed above
   - When fixing issues, ensure both test files still pass
   - Consider adding specific regression tests for each fix
+
+- [x] 12. Support Promptsfile in custom directory
+  - Search order: `$PROMPT_SYNC_DIR`, `./Promptsfile`, `./.ai/Promptsfile`
+  - Update loader, installer, and all CLI commands
+  - Ensure lock file lives next to detected Promptsfile
+  - Maintain backward compatibility
