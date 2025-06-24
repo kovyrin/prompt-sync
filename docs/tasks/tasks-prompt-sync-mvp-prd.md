@@ -381,14 +381,7 @@ prompt-sync update --dry-run
 
     **Note:** Run `testdata/setup-fixtures.sh` to create test repositories before running real-world tests
 
-  - [ ] 9A.4. Add performance benchmarks:
-
-    - Measure time for initial clone vs cached operations
-    - Compare go-git vs exec-git backend performance
-    - Test with various repository sizes
-    - Verify acceptable performance for CI environments
-
-  - [ ] 9A.5. Document any gaps found and create follow-up tasks if needed.
+  - [x] 9A.4. Document any gaps found and create follow-up tasks if needed.
 
 - [ ] 10. CI/headless mode safeguards & security enforcement
 
