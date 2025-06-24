@@ -242,6 +242,54 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
 
   - [x] 9.4. Verify updates work correctly with pinned/unpinned sources.
 
+- [x] 9A. Comprehensive end-to-end workflow testing
+
+  - [x] 9A.1. Write comprehensive system test `internal/test/system/full_workflow_test.go` covering the complete user journey:
+
+    - Initialize new project with `init`
+    - Add multiple sources (trusted and untrusted) with `add`
+    - Install prompts and verify files are rendered
+    - List installed prompts with various flags
+    - Update specific sources and verify lock file changes
+    - Remove sources and verify cleanup
+    - Run `verify` to ensure consistency
+    - Test with both adapters (Cursor and Claude)
+
+  - [x] 9A.2. Add edge case scenarios to the end-to-end test:
+
+    - Conflicting prompts from multiple sources
+    - Version upgrades and downgrades
+    - Offline mode with cached repositories
+    - CI mode behavior (non-interactive, strict)
+    - Recovery from interrupted operations
+    - Working with pinned vs unpinned sources
+    - Overlay precedence (personal > project > org)
+
+  - [x] 9A.3. Create real-world test fixtures:
+
+    - Multiple test repositories with different prompt structures
+    - Repositories with version tags and branches
+    - Prompts with MDC frontmatter and metadata
+    - Conflicting file names across repositories
+    - Large repository to test git backend switching
+
+    **Findings:**
+
+    - Adapters only search in hardcoded directories (`prompts/`, `rules/`, `commands/`)
+    - Remove command has inconsistent file cleanup behavior
+    - Version switching doesn't clean up old files automatically
+    - Nested directory structures cause conflicts when flattened
+    - No support for custom prompt directories
+
+  - [ ] 9A.4. Add performance benchmarks:
+
+    - Measure time for initial clone vs cached operations
+    - Compare go-git vs exec-git backend performance
+    - Test with various repository sizes
+    - Verify acceptable performance for CI environments
+
+  - [ ] 9A.5. Document any gaps found and create follow-up tasks if needed.
+
 - [ ] 10. CI/headless mode safeguards & security enforcement
 
   - [ ] 10.1. Write failing system test `internal/test/system/ci_mode_system_test.go` ensuring `CI=true prompt-sync install` runs non-interactively and exits non-zero on conflict.
@@ -253,3 +301,39 @@ _For full background and goals, see the [Product Requirements Document](prompt-s
   - [ ] 10.4. Hook CI guard into root command persistent pre-run.
 
   - [ ] 10.5. Verify by running `CI=true go test ./...` and executing `prompt-sync ci-install`.
+
+- [ ] 11. Fix deficiencies found during testing
+
+  - [ ] 11.1. Fix remove command file cleanup reliability
+
+    - Investigate why file cleanup sometimes fails
+    - Ensure all rendered files are properly tracked and removed
+    - Add proper error handling and recovery
+    - Update tests to verify cleanup works consistently
+
+  - [ ] 11.2. Implement version switching cleanup
+
+    - When updating to a new version, remove files that no longer exist
+    - Track which files belong to which source version
+    - Provide option to clean orphaned files
+    - Document the behavior clearly
+
+  - [ ] 11.3. Add support for custom prompt directories
+
+    - Allow repos to specify custom directories via metadata
+    - Support `.prompt-sync.yaml` config in repos
+    - Make directory discovery more flexible
+    - Maintain backward compatibility
+
+  - [ ] 11.4. Improve conflict handling for nested structures
+
+    - Add option to preserve directory structure in output
+    - Implement namespace prefixing for conflicting files
+    - Provide clear conflict resolution strategies
+    - Better error messages showing exact conflict paths
+
+  - [ ] 11.5. Add file tracking to lock file
+    - Include rendered file paths in lock file
+    - Track source file to output file mapping
+    - Enable proper cleanup on remove/update
+    - Support drift detection at file level
