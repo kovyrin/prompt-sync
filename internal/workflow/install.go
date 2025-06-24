@@ -41,8 +41,15 @@ type Installer struct {
 
 // New creates a new installer
 func New(opts InstallOptions) (*Installer, error) {
+	// Detect where the Promptsfile is located so we can load config and write lock file next to it
+	promptsPath, _ := config.FindPromptsfilePath(opts.WorkspaceDir) // ignore error, may not exist yet in init
+	promptsDir := filepath.Dir(promptsPath)
+	if promptsDir == "." || promptsDir == "" {
+		promptsDir = opts.WorkspaceDir
+	}
+
 	// Initialize components
-	configLoader := config.NewLoader(opts.WorkspaceDir)
+	configLoader := config.NewLoader(promptsDir)
 
 	// Initialize trusted sources
 	trustedSources := security.NewTrustedSources()
@@ -58,7 +65,7 @@ func New(opts InstallOptions) (*Installer, error) {
 
 	// Initialize other components
 	gitignoreManager := gitignore.New(opts.WorkspaceDir)
-	lockWriter := lock.New(opts.WorkspaceDir)
+	lockWriter := lock.New(promptsDir)
 	conflictDetector := conflict.New(opts.StrictMode)
 
 	// Initialize adapters

@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"sort"
 
+	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,6 +22,37 @@ type Source struct {
 // about at load-time. For the MVP, we only expose the list of trusted sources.
 type Config struct {
 	Sources []Source
+}
+
+// FindPromptsfilePath locates the Promptsfile according to the following precedence:
+//  1. $PROMPT_SYNC_DIR if set – must contain a Promptsfile
+//  2. <workspaceDir>/Promptsfile
+//  3. <workspaceDir>/.ai/Promptsfile
+//
+// Returns the full path to the Promptsfile or an error if not found.
+func FindPromptsfilePath(workspaceDir string) (string, error) {
+	// 1. Explicit override via env var
+	if custom := os.Getenv("PROMPT_SYNC_DIR"); custom != "" {
+		candidate := filepath.Join(custom, "Promptsfile")
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+		return "", fmt.Errorf("PROMPT_SYNC_DIR is set but Promptsfile not found at %s", candidate)
+	}
+
+	// 2. Root directory
+	rootCandidate := filepath.Join(workspaceDir, "Promptsfile")
+	if _, err := os.Stat(rootCandidate); err == nil {
+		return rootCandidate, nil
+	}
+
+	// 3. .ai directory
+	aiCandidate := filepath.Join(workspaceDir, ".ai", "Promptsfile")
+	if _, err := os.Stat(aiCandidate); err == nil {
+		return aiCandidate, nil
+	}
+
+	return "", fmt.Errorf("Promptsfile not found (searched: %s, %s)", rootCandidate, aiCandidate)
 }
 
 // Load reads configuration from the following locations (lowest precedence → highest):

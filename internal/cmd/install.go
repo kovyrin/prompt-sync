@@ -55,11 +55,6 @@ func runInstall(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
 
-	// Check if Promptsfile exists
-	if _, err := os.Stat("Promptsfile"); os.IsNotExist(err) {
-		return fmt.Errorf("Promptsfile not found. Run 'prompt-sync init' first")
-	}
-
 	// Create installer
 	installer, err := workflow.New(workflow.InstallOptions{
 		WorkspaceDir: workspaceDir,

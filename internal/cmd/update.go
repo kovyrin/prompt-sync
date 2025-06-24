@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -75,18 +76,20 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("getting current directory: %w", err)
 	}
 
-	// Check if Promptsfile exists
-	if _, err := os.Stat("Promptsfile"); os.IsNotExist(err) {
-		return fmt.Errorf("Promptsfile not found. Run 'prompt-sync init' first")
+	// Locate Promptsfile
+	promptsPath, err := config.FindPromptsfilePath(workDir)
+	if err != nil {
+		return err
 	}
+	promptsDir := filepath.Dir(promptsPath)
 
-	// Check if lock file exists
-	if _, err := os.Stat("Promptsfile.lock"); os.IsNotExist(err) {
+	// Check if lock file exists next to Promptsfile
+	if _, err := os.Stat(filepath.Join(promptsDir, "Promptsfile.lock")); os.IsNotExist(err) {
 		return fmt.Errorf("no lock file found. Run 'prompt-sync install' first")
 	}
 
 	// Load configuration
-	loader := config.NewLoader(workDir)
+	loader := config.NewLoader(promptsDir)
 	cfg, err := loader.Load()
 	if err != nil {
 		return fmt.Errorf("loading Promptsfile: %w", err)

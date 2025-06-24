@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -44,15 +45,22 @@ func runList(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("getting current directory: %w", err)
 	}
 
+	// Locate Promptsfile (supports root, .ai, or $PROMPT_SYNC_DIR)
+	promptsPath, err := config.FindPromptsfilePath(workDir)
+	if err != nil {
+		return err
+	}
+	promptsDir := filepath.Dir(promptsPath)
+
 	// Load Promptsfile
-	loader := config.NewLoader(workDir)
+	loader := config.NewLoader(promptsDir)
 	cfg, err := loader.Load()
 	if err != nil {
 		return fmt.Errorf("loading Promptsfile: %w", err)
 	}
 
 	// Load lock file if it exists
-	lockWriter := lock.New(workDir)
+	lockWriter := lock.New(promptsDir)
 	lockData, err := lockWriter.Read()
 	if err != nil {
 		return fmt.Errorf("loading lock file: %w", err)

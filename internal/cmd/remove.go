@@ -52,14 +52,15 @@ func runRemove(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("getting current directory: %w", err)
 	}
 
-	// Check if Promptsfile exists
-	promptsfilePath := "Promptsfile"
-	if _, err := os.Stat(promptsfilePath); os.IsNotExist(err) {
-		return fmt.Errorf("Promptsfile not found. Run 'prompt-sync init' first")
+	// Locate Promptsfile
+	promptsfilePath, err := config.FindPromptsfilePath(workDir)
+	if err != nil {
+		return err
 	}
+	promptsDir := filepath.Dir(promptsfilePath)
 
 	// Load current configuration
-	loader := config.NewLoader(workDir)
+	loader := config.NewLoader(promptsDir)
 	cfg, err := loader.Load()
 	if err != nil {
 		return fmt.Errorf("loading Promptsfile: %w", err)
@@ -84,7 +85,7 @@ func runRemove(cmd *cobra.Command, args []string) error {
 	cfg.Sources = updatedSources
 
 	// Load lock file to get file paths for cleanup
-	lockWriter := lock.New(workDir)
+	lockWriter := lock.New(promptsDir)
 	lockData, err := lockWriter.Read()
 	if err == nil && lockData != nil {
 		// Clean up rendered files
