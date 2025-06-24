@@ -92,36 +92,23 @@ func TestRealWorldScenarios(t *testing.T) {
 		output, err = cmd.CombinedOutput()
 		require.NoError(t, err, "Install v2.0.0 failed: %s", string(output))
 
-		// Note: The tool doesn't automatically remove old files when changing versions
-		// authentication.md will still exist from v1.0.0
-		// This is expected behavior - users need to clean manually or remove/re-add
-		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/authentication.md"), "authentication.md remains from v1.0.0")
+		// With the version switching cleanup fix, old files should now be removed
+		assert.NoFileExists(t, filepath.Join(workDir, ".cursor/rules/_active/authentication.md"), "authentication.md should be removed when switching to v2.0.0")
 		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/auth-patterns.md"), "auth-patterns.md should exist in v2.0.0")
 		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/breaking-changes.md"), "breaking-changes.md should exist in v2.0.0")
 
-		// To properly test version switching with cleanup, remove and re-add
-		cmd = exec.Command(binPath, "remove", "file://"+enterpriseRepo)
-		cmd.Dir = workDir
-		output, err = cmd.CombinedOutput()
-		t.Logf("Remove output: %s", string(output))
-		require.NoError(t, err, "Remove failed: %s", string(output))
+		// Test that common files (present in both versions) are preserved
+		// The test data shows that enterprise-prompts has different files between versions
+		// v1.0.0: security/authentication.md, testing/unit-testing.md
+		// v2.0.0: security/auth-patterns.md, testing/unit-testing.md, breaking-changes.md, architecture/event-driven.md, architecture/microservices.mdc
+		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/unit-testing.md"), "unit-testing.md should remain (exists in both versions)")
 
-		// Note: The remove command has an issue where it doesn't always clean up files
-		// This is a known limitation - files might remain after removal
-		// For now, we'll skip the file cleanup check and focus on the version switching
+		// Also verify new v2.0.0 files exist
+		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/event-driven.md"), "event-driven.md should exist in v2.0.0")
+		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/microservices.mdc"), "microservices.mdc should exist in v2.0.0")
 
-		// Add v2.0.0 and verify it installs correctly
-		cmd = exec.Command(binPath, "add", "file://"+enterpriseRepo+"#v2.0.0", "--allow-unknown")
-		cmd.Dir = workDir
-		output, err = cmd.CombinedOutput()
-		require.NoError(t, err, "Re-add v2.0.0 failed: %s", string(output))
-
-		// Now verify v2.0.0 changes are properly applied
-		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/auth-patterns.md"), "auth-patterns.md should exist in v2.0.0")
-		assert.FileExists(t, filepath.Join(workDir, ".cursor/rules/_active/breaking-changes.md"), "breaking-changes.md should exist in v2.0.0 after clean install")
-
-		// Both authentication.md (from v1.0.0) and auth-patterns.md (from v2.0.0) might exist
-		// This demonstrates the version switching behavior
+		// Verify the remove/re-add workflow is no longer necessary
+		// The cleanup functionality makes version switching seamless
 	})
 
 	t.Run("large repository performance", func(t *testing.T) {

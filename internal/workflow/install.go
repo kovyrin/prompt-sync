@@ -79,6 +79,11 @@ func New(opts InstallOptions) (*Installer, error) {
 	}, nil
 }
 
+// SetGitFetcher allows replacing the git fetcher (primarily for testing)
+func (i *Installer) SetGitFetcher(fetcher git.Fetcher) {
+	i.gitFetcher = fetcher
+}
+
 // Execute runs the installation workflow
 func (i *Installer) Execute() error {
 	// Load configuration
@@ -90,6 +95,21 @@ func (i *Installer) Execute() error {
 	// In verify mode, check if lock file exists
 	if i.opts.VerifyOnly && !i.lockWriter.Exists() {
 		return fmt.Errorf("lock file not found, run install first")
+	}
+
+	// Read existing lock file to track old files for cleanup
+	oldLock, err := i.lockWriter.Read()
+	if err != nil {
+		return fmt.Errorf("failed to read lock file: %w", err)
+	}
+
+	// Create a map of old files per source for efficient lookup
+	oldFilesBySource := make(map[string][]lock.File)
+	if oldLock != nil {
+		for _, source := range oldLock.Sources {
+			baseURL := strings.Split(source.URL, "#")[0]
+			oldFilesBySource[baseURL] = source.Files
+		}
 	}
 
 	// Validate sources against trusted list
@@ -200,6 +220,18 @@ func (i *Installer) Execute() error {
 			}
 		}
 
+		// Clean up orphaned files if this source was previously installed
+		if oldFiles, exists := oldFilesBySource[url]; exists && !i.opts.VerifyOnly {
+			orphanedFiles := i.findOrphanedFiles(oldFiles, lockFiles)
+			for _, orphan := range orphanedFiles {
+				fullPath := filepath.Join(i.opts.WorkspaceDir, orphan)
+				if err := os.Remove(fullPath); err != nil && !os.IsNotExist(err) {
+					// Log warning but don't fail the entire operation
+					fmt.Printf("Warning: could not remove orphaned file %s: %v\n", orphan, err)
+				}
+			}
+		}
+
 		lockSources = append(lockSources, lock.Source{
 			URL:    url,
 			Ref:    ref,
@@ -298,4 +330,23 @@ func (i *Installer) getAdapterConfig(cfg *config.ExtendedConfig, name string) ad
 	default:
 		return adapter.Config{}
 	}
+}
+
+// findOrphanedFiles returns files that exist in oldFiles but not in newFiles
+func (i *Installer) findOrphanedFiles(oldFiles, newFiles []lock.File) []string {
+	// Create a set of new file paths
+	newPaths := make(map[string]bool)
+	for _, f := range newFiles {
+		newPaths[f.Path] = true
+	}
+
+	// Find files that exist in old but not in new
+	var orphaned []string
+	for _, f := range oldFiles {
+		if !newPaths[f.Path] {
+			orphaned = append(orphaned, f.Path)
+		}
+	}
+
+	return orphaned
 }

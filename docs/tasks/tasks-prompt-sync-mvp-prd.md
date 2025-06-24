@@ -2,9 +2,29 @@
 
 _For full background and goals, see the [Product Requirements Document](prompt-sync-mvp-prd.md)._
 
-## Session Summary (2024-01-23)
+## Session Summary (2025-06-23)
 
 **Tasks Completed in This Session:**
+
+- Task 11.2: Implemented version switching cleanup
+  - Files from old versions are now automatically removed when updating to new versions
+  - Added comprehensive unit and integration tests
+  - Fixed the real-world test to reflect the new behavior
+
+**Repository Status:**
+
+- 7 commits ahead of origin/main
+- All tests passing (`make test`)
+- Linter clean (`make lint`)
+- Files modified:
+  - `internal/workflow/install.go` - Added orphaned file cleanup logic
+  - `internal/test/system/real_world_test.go` - Updated test expectations
+  - Added `internal/test/unit/install_workflow_cleanup_test.go`
+  - Added `internal/test/integration/version_switching_test.go`
+
+## Previous Session Summary (2024-01-23)
+
+**Tasks Completed in Previous Session:**
 
 - Task 7: Implemented `add` command with unit, integration, and system tests
 - Task 8: Implemented `remove` command with full test coverage
@@ -416,13 +436,22 @@ prompt-sync update --dry-run
     - Update tests to verify cleanup works consistently
     - **Implementation hint:** Check `internal/cmd/remove.go` - may need to track files in lock file
 
-  - [ ] 11.2. Implement version switching cleanup
+  - [x] 11.2. Implement version switching cleanup
 
     - When updating to a new version, remove files that no longer exist
     - Track which files belong to which source version
     - Provide option to clean orphaned files
     - Document the behavior clearly
     - **Implementation hint:** Compare old vs new file lists during install, remove orphans
+    - **Implementation completed:**
+      - Added orphaned file detection in `internal/workflow/install.go`
+      - Reads old lock file before installation to track previous files
+      - Compares old vs new file lists and removes orphaned files
+      - Added `findOrphanedFiles` helper method
+      - Created unit test `internal/test/unit/install_workflow_cleanup_test.go`
+      - Created integration test `internal/test/integration/version_switching_test.go`
+      - Updated `real_world_test.go` to reflect new behavior
+      - All tests passing, version switching now seamlessly removes old files
 
   - [ ] 11.3. Add support for custom prompt directories
 
