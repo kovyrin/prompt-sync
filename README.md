@@ -1,5 +1,9 @@
 # Prompt-Sync
 
+[![Go Version](https://img.shields.io/github/go-mod/go-version/kovyrin/prompt-sync)](https://github.com/kovyrin/prompt-sync)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kovyrin/prompt-sync)](https://goreportcard.com/report/github.com/kovyrin/prompt-sync)
+
 > 🛠️ **Package-manager-style CLI for trusted AI prompts & rules**
 >
 > Think **"npm for AI prompts"** – install, version-lock and audit prompt packs locally **without public registries**.
@@ -16,23 +20,35 @@ Modern developer agents (Cursor, Claude, Copilot, …) rely on markdown prompts 
 - 🤖 **Render** the same logical prompt for multiple agents automatically
 - 🔐 **Stay offline-friendly** – zero outbound traffic by default
 
-See [`docs/tasks/prompt-sync-mvp-prd.md`](docs/tasks/prompt-sync-mvp-prd.md) for the full Product Requirements Document.
+**⚡ Status:** MVP (v0.1) - Core functionality implemented and tested. See [`docs/tasks/prompt-sync-mvp-prd.md`](docs/tasks/prompt-sync-mvp-prd.md) for the full Product Requirements Document.
+
+## 📚 Table of Contents
+
+- [Why Prompt-Sync?](#-why-prompt-sync)
+- [Quick Start](#-quick-start)
+- [Core Concepts](#-core-concepts)
+- [CLI Overview](#️-cli-overview-v01)
+- [Configuration Files](#️-configuration-files)
+- [Security Model](#️-security-model)
+- [Roadmap](#️-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Install the CLI (Homebrew tap coming soon)
+# 1. Install the CLI
 go install github.com/kovyrin/prompt-sync/cmd/prompt-sync@latest
 
-# 2. Initialise a new repo
+# 2. Initialize a new project
 prompt-sync init  # generates Promptsfile & .gitignore block
 
-# 3. Add a prompt pack
-prompt-sync add shopify/graphql@stable
+# 3. Add a prompt pack (replace with your trusted source)
+prompt-sync add github.com/your-org/ai-prompts
 
-# 4. Install / render prompts for Cursor & Claude
+# 4. Install and render prompts for Cursor & Claude
 prompt-sync install   # deterministic, uses Promptsfile.lock
 ```
 
@@ -86,11 +102,12 @@ Example minimal **Promptsfile**:
 version: 1
 
 sources:
-  - name: shopify
-    repo: git@github.com:shopify/ai-prompts.git
+  - name: my-org
+    repo: git@github.com:my-org/ai-prompts.git
 
 rulesets:
-  - shopify/graphql@stable
+  - my-org/coding-standards
+  - my-org/git-workflow@v1.0
 ```
 
 ---
@@ -120,9 +137,30 @@ Track progress in the [project roadmap](docs/tasks/prompt-sync-mvp-prd.md#9-road
 
 Pull-requests and issues are welcome! Please:
 
-1. Read the [code of conduct](CODE_OF_CONDUCT.md) (TBD).
-2. Open an issue to discuss major changes.
-3. Ensure `go test ./...` & `prompt-sync verify` pass.
+1. Open an issue to discuss major changes before implementing.
+2. Ensure `make test` and `make lint` pass locally.
+3. Follow the existing code style and patterns.
+4. Add tests for new functionality.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/kovyrin/prompt-sync.git
+cd prompt-sync
+
+# Run tests
+make test
+
+# Run linter
+make lint
+
+# Build binary
+make build
+
+# Test locally
+./bin/prompt-sync --help
+```
 
 ---
 
