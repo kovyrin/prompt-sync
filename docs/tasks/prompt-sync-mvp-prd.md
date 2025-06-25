@@ -1,6 +1,6 @@
 # Product Requirements Document: Prompt-Sync MVP
 
-_Last updated: 2025-06-22_
+_Last updated: 2025-06-24_
 
 ---
 
@@ -171,6 +171,41 @@ Personal > project > org precedence. Only _winning_ files enter the lock; person
 
 - Install ≤ 5 seconds for 100 prompt files (post-clone).
 - CLI start-up ≤ 200 ms on cold start.
+
+### 5.6 Distribution & Release Automation
+
+Prompt-Sync binaries must be easy to **install**, **update**, and **publish** without requiring developers to remember multi-step commands.
+
+**Requirements**
+
+1. **One-liner install / update**
+
+   - Primary path: `go install github.com/kovyrin/prompt-sync/cmd/prompt-sync@latest`.
+   - Convenience wrapper: `make install` (delegates to the same `go install` line).
+   - Works on any machine with Go ≥1.22 and internet access to GitHub.
+
+2. **Tagged releases + automated artifacts**
+
+   - `make release VERSION=vX.Y.Z` – verifies clean git tree, tags the commit, pushes the tag.
+   - A GitHub Actions workflow (`.github/workflows/release.yml`) watches `v*.*.*` tags and runs **GoReleaser**.
+   - GoReleaser cross-compiles macOS & Linux binaries for `amd64` and `arm64`, packages them as `tar.gz`, and uploads checksums.
+
+3. **Snapshot builds for local testing**
+
+   - `make snapshot` runs `goreleaser release --snapshot --clean` producing local artifacts suffixed with `+dirty` (not published).
+
+4. **Optional Homebrew tap (post-MVP)**
+   - Tap scaffolding is commented in `.goreleaser.yml`; enable once `homebrew-tap` repo is ready.
+
+**Non-Goals**
+
+- Windows binaries (deferred until v1.0).
+- Automated push on every commit to `main` – only explicit semver tags trigger releases.
+
+**Implications**
+
+- Removes the open question around "Binary Distribution" by adopting the GoReleaser + GitHub Releases approach.
+- Keeps the MVP toolchain Go-native; no additional package registry required.
 
 ---
 

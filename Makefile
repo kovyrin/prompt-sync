@@ -48,3 +48,30 @@ watch: ## Watch Go files and auto-test on changes (human-only)
 	find . -type f -name '*.go' | entr -c make test
 
 export PATH := $(PATH):$(shell go env GOPATH)/bin
+
+# -----------------------------------------------------------------------------
+# 🏷️ Release helpers (requires GoReleaser)
+# -----------------------------------------------------------------------------
+# Usage:
+#   make snapshot           # local build without publishing, suffix +dirty
+#   make release VERSION=v0.2.0  # tag & push, GitHub Actions builds artifacts
+# -----------------------------------------------------------------------------
+
+snapshot: ## Build a local snapshot release with GoReleaser
+	@command -v goreleaser >/dev/null 2>&1 || { \
+		echo "GoReleaser not found. Installing..."; \
+		GO111MODULE=on go install github.com/goreleaser/goreleaser@latest; \
+	}
+	goreleaser release --snapshot --clean
+
+release: ## Create a git tag and push to trigger CI release (VERSION=<semver> required)
+ifndef VERSION
+	$(error VERSION is not set. Example: make release VERSION=v0.2.0)
+endif
+	@git diff --quiet || { echo "Working tree is dirty. Commit or stash changes before releasing."; exit 1; }
+	@git tag -a $(VERSION) -m "Release $(VERSION)"
+	@git push origin $(VERSION)
+
+# Simple one-liner installation helper (delegates to `go install`)
+install: ## Install or update prompt-sync to the latest version via go install
+	go install github.com/kovyrin/prompt-sync/cmd/prompt-sync@latest

@@ -511,3 +511,92 @@ prompt-sync update --dry-run
   - Update loader, installer, and all CLI commands
   - Ensure lock file lives next to detected Promptsfile
   - Maintain backward compatibility
+
+## Session Summary (2025-06-24)
+
+**Tasks Completed in This Session:**
+
+- Task 13.1: Added one-liner install helper
+  - `make install` target delegates to `go install ...@latest`
+- Task 13.2: Added snapshot build target
+  - `make snapshot` runs GoReleaser in snapshot mode
+- Task 13.3: Implemented automated release workflow
+  - `.github/workflows/release.yml` triggers on semver tags and runs GoReleaser
+  - Cross-compiles macOS/Linux (`amd64`, `arm64`) tarballs and checksums
+- Task 13.4: Added GoReleaser config
+  - `.goreleaser.yml` defines builds, archives, checksums, and GitHub release settings
+- Task 13.5: Updated PRD section 5.6 with distribution details
+
+**Repository Status:**
+
+- All tests passing (`make test`)
+- Linter clean (`make lint`)
+- Binary builds and release artifacts generated successfully with `make snapshot`
+
+## Relevant Files
+
+- `internal/test/system/init_system_test.go` – End-to-end system tests for `prompt-sync init` (**write first**).
+- `internal/cmd/root.go` – CLI entry-point (Cobra/Viper setup).
+- `internal/cmd/init.go` – Implementation of `init` command.
+
+- `internal/test/unit/config_loader_test.go` – Unit tests for configuration loader.
+- `internal/config/loader.go` – Loads Promptsfile, local overrides, user config.
+
+- `internal/test/unit/trusted_sources_test.go` – Unit tests for trusted source enforcement.
+- `internal/security/trusted_sources.go` – Logic for allow-list and enforcement.
+
+- `internal/test/contract/git_fetcher_contract_test.go` – Contract tests for Git fetcher interface.
+- `internal/git/fetcher.go` – Git cloning & local cache management (go-git backend).
+- `internal/git/fetcher_exec.go` – Exec backend using system git (auto-selected for large repos).
+
+- `internal/test/contract/adapter_contract_test.go` – Contract tests for AgentAdapter interface.
+- `internal/adapter/adapter.go` – Shared adapter interface definition.
+- `internal/adapter/cursor/cursor_adapter.go` – Cursor adapter implementation.
+- `internal/adapter/claude/claude_adapter.go` – Claude adapter implementation.
+- `internal/test/unit/cursor_adapter_test.go` – Unit tests for Cursor adapter metadata merging.
+- `internal/test/unit/claude_adapter_test.go` – Unit tests for Claude adapter prefix resolution.
+
+- `internal/test/integration/install_workflow_test.go` – Integration tests for `install` + `verify` end-to-end.
+- `internal/workflow/install.go` – Install workflow orchestration.
+- `internal/lock/lock_writer.go` – Lock file generation & parsing.
+- `internal/gitignore/manager.go` – Managed `.gitignore` block injection & verification.
+
+- `internal/test/unit/conflict_detector_test.go` – Unit tests for duplicate/​hash conflict detection.
+- `internal/conflict/detector.go` – Conflict detection logic.
+
+- `internal/test/unit/cli_commands_test.go` – Unit tests for `add`, `remove`, `update`, `list` commands.
+- `internal/cmd/add.go`, `internal/cmd/remove.go`, `internal/cmd/update.go`, `internal/cmd/list.go` – Lifecycle commands.
+
+- `internal/test/system/ci_mode_system_test.go` – System tests for CI/headless mode.
+- `internal/ci/ci_guard.go` – CI safeguards (non-interactive flags, security levels).
+
+### Notes
+
+- **Outside-In TDD Reminder**: For every new feature, start with the highest-level failing test (system or contract). Write minimal code to pass before moving inward.
+- **Safe Iteration**: One failing test at a time. Run `go test ./...` after each small change to keep feedback fast.
+- **Test Layer Strategy**:
+  • _System tests_ (`internal/test/system/`) execute the compiled binary via `os/exec` for real user flows.
+  • _Contract tests_ (`internal/test/contract/`) define interfaces (e.g., GitFetcher, Adapter) before implementation.
+  • _Integration tests_ (`internal/test/integration/`) exercise multiple layers together with fakes/mocks instead of real Git.
+  • _Unit tests_ (`internal/test/unit/`) cover individual structs & methods.
+- **Mocking & Stubs**: Use Go's `testing` + `httptest` & testify mocks. For Git, use a local bare repo fixture to avoid network calls.
+- **CI Verification**: All verification tasks run `CI=true go test ./...` to ensure headless mode passes.
+- **Managed `.gitignore` Block**: Implement idempotent insert/update logic; verify it every `install` and in tests.
+- **Security Levels**: Security enforcement must block high-risk prompts in `--strict` or `CI=true`.
+- **Code Standards**: Run `go vet ./...` and `golangci-lint run` (add to `Makefile`) before committing.
+- **Watch Target (human-only)**: The Makefile includes `make watch` (uses `entr`) for humans; AI agents must NOT run it—run `make test` manually after each change instead.
+- **Caching**: Git clones live under `$HOME/.prompt-sync/repos`; design Fetcher to support `--offline`.
+- **Cache Directory Override**: Allow environment variable `PROMPT_SYNC_CACHE_DIR` or `--cache-dir` flag to override the default location.
+- **Overlay Precedence**: Personal > project > org overlays must be applied when assembling rendered files; lower scopes are shadowed by higher ones.
+- **Strict Mode**: `--strict` flag (or `CI=true`) escalates warnings (conflicts, hash drift, high security) to hard errors and aborts the operation.
+
+## Tasks
+
+- [ ] 13. Distribution & Release Automation
+
+  - [x] 13.1. Add `make install` helper delegating to `go install ...@latest`
+  - [x] 13.2. Add `make snapshot` target running GoReleaser in snapshot mode
+  - [x] 13.3. Add GitHub Actions workflow `.github/workflows/release.yml` that runs on `v*.*.*` tags and executes GoReleaser
+  - [x] 13.4. Add `.goreleaser.yml` with cross-platform build config (darwin/linux • amd64/arm64) and checksum generation
+  - [x] 13.5. Update PRD (section 5.6) documenting distribution workflow
+  - [ ] 13.6. Homebrew tap publishing (post-MVP) – uncomment `brews:` section in GoReleaser once tap repo is created
