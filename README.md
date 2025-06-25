@@ -164,6 +164,19 @@ make build
 
 ---
 
+## ⚠️ Disclaimer
+
+This project was developed with the assistance of AI agents. While we strive for quality and reliability, this comes with inherent risks including potential bugs, security vulnerabilities, or unexpected behavior. **Use at your own discretion** and thoroughly test in your environment before production use.
+
+We recommend:
+
+- Review the code before using in production
+- Test thoroughly with your specific use cases
+- Keep backups of important prompt files
+- Stay updated with releases and security advisories
+
+---
+
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for details.
